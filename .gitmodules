@@ -1,0 +1,3 @@
+[submodule "external_tools/roptimus-prime"]
+	path = external_tools/roptimus-prime
+	url = https://github.com/AutomatedProcessImprovement/roptimus-prime
