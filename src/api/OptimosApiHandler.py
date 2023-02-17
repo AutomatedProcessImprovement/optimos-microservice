@@ -1,9 +1,13 @@
+import json
+
 from flask import request, make_response
 from flask_restful import Resource
 
 from optimos import run_optimization
 import tempfile
 import os
+
+from src.tasks import optimization_task
 
 
 class OptimosApiHandler(Resource):
@@ -37,15 +41,18 @@ class OptimosApiHandler(Resource):
             sim_params_file = self.__saveFile(sim_params_data, "params_", celery_data_path)
             bpmn_file = self.__saveFile(xml_data, "bpmn_model_", celery_data_path)
 
-            model_path = os.path.abspath(os.path.join(celery_data_path, bpmn_file))
-            sim_param_path = os.path.abspath(os.path.join(celery_data_path, sim_params_file))
-            constraints_path = os.path.abspath(os.path.join(celery_data_path, constraints_file))
+            task = optimization_task(bpmn_file, sim_params_file, constraints_file, total_iterations, algorithm, approach)
+            # task_id = task.id
 
-            res = run_optimization(model_path, sim_param_path, constraints_path, total_iterations, algorithm, approach)
-            print(res)
-            response = make_response(f"""{{"TaskId":"{123}"}}""")
+            task_response = f"""{{"TaskId": "{123}"}}"""
+
+            response = make_response(task)
             response.headers['content-type'] = 'application/json'
             return response
         except Exception as e:
             print(e)
-            return "", 500
+            response = {
+                "displayMessage": "Something went wrong"
+            }
+
+            return response, 500
