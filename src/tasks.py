@@ -15,7 +15,7 @@ celery = create_celery(create_app())
 
 
 @celery.task(name='optimization_task')
-def optimization_task(model_filename, sim_params_file, cons_params_file, num_instances, algorithm, approach):
+def optimization_task(model_filename, sim_params_file, cons_params_file, num_instances, algorithm, approach, log_name):
     logger.info(f'Model file: {model_filename}')
     logger.info(f'Sim params file: {sim_params_file}')
     logger.info(f'Cons params file: {cons_params_file}')
@@ -41,7 +41,7 @@ def optimization_task(model_filename, sim_params_file, cons_params_file, num_ins
     # logs_filename = logs_file.name.rsplit(os.sep, 1)[-1]
 
     report = run_optimization(model_path, sim_param_path, constraints_path, num_instances, algorithm, approach,
-                              stats_file.name)
+                              stats_file.name, log_name)
 
     return {
         "stat_path": stats_filename,

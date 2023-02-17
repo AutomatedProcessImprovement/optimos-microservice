@@ -29,6 +29,7 @@ class OptimosApiHandler(Resource):
             total_iterations = int(form_data.get('total_iterations'))
             algorithm = form_data.get('algorithm')
             approach = form_data.get('approach')
+            log_name = form_data.get('log_name')
 
             sim_params_data = files_data.get('simScenarioFile')
             constraints_data = files_data.get('constraintsFile')
@@ -41,12 +42,12 @@ class OptimosApiHandler(Resource):
             sim_params_file = self.__saveFile(sim_params_data, "params_", celery_data_path)
             bpmn_file = self.__saveFile(xml_data, "bpmn_model_", celery_data_path)
 
-            task = optimization_task(bpmn_file, sim_params_file, constraints_file, total_iterations, algorithm, approach)
-            # task_id = task.id
+            task = optimization_task.delay(bpmn_file, sim_params_file, constraints_file, total_iterations, algorithm, approach, log_name)
+            task_id = task.id
 
-            task_response = f"""{{"TaskId": "{123}"}}"""
+            task_response = f"""{{"TaskId": "{task_id}"}}"""
 
-            response = make_response(task)
+            response = make_response(task_response)
             response.headers['content-type'] = 'application/json'
             return response
         except Exception as e:
