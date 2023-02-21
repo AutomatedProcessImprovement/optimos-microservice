@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+    # broker deployment
+    rabbit:
+        hostname: rabbit
+        image: rabbitmq:3-management
+        container_name: optimos-service-rabbitmq
+        # environment:
+        #     - RABBITMQ_DEFAULT_USER=myuser
+        #     - RABBITMQ_DEFAULT_PASS=mypassword
+        ports:
+            - 5672:5672 # port for the worker for tasks management
+            - 15672:15672 # GUI port
+
+    # worker deployment
+    worker:
+        build:
+            context: .
+            dockerfile: Dockerfile.worker
+        container_name: optimos-service-celery-worker
+        environment:
+            - CELERY_BROKER_URL=amqp://rabbit:5672/
+            - CELERY_RESULT_BACKEND=redis://redis:6379/
+            - FLASK_DEBUG=1
+        volumes:
+            - ./src/celery/data:/app/src/celery/data
+        depends_on:
+        - rabbit
+        - redis
+
+    # flask app deployment
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile.api
+        container_name: optimos-service-api
+        ports:
+            - 5000:5000
+        volumes:
+            - ./src/celery/data:/app/src/celery/data
+        environment:
+            - CELERY_BROKER_URL=amqp://rabbit:5672/
+            - CELERY_RESULT_BACKEND=redis://redis:6379/
+            - FLASK_DEBUG=1
+
+    redis:
+        image: redis:6-alpine
+        ports:
+            - 6379:6379

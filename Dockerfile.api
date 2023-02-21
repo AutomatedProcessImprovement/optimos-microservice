@@ -1,0 +1,49 @@
+# stage 1: build
+FROM python:3.10-slim-buster AS builder
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    python3 -m pip install --upgrade pip
+
+WORKDIR /app
+
+COPY .git/ ./.git/
+COPY .gitmodules/ .
+COPY ./requirements.txt .
+
+# define from where we need to load Optimos app
+# 1) pull from the repository main branch
+# RUN git submodule update --init --recursive
+
+# 2) use local version of Optimos (under the path ./external_tools/roptimus-prime)
+COPY external_tools/roptimus-prime external_tools/roptimus-prime
+
+RUN pip install -r requirements.txt
+RUN cd /app/external_tools/roptimus-prime && pip install -r requirements.txt
+RUN cd /app/external_tools/roptimus-prime/ext_tools/Prosimos && pip install -r requirements.txt
+RUN apt-get clean
+
+# stage 2: run the flask app
+FROM python:3.10-slim-buster
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app/external_tools /app/external_tools
+
+WORKDIR /app
+COPY ./src ./src
+COPY ./exts.py .
+COPY ./factory.py .
+COPY ./app.py .
+
+ENV FLASK_ENV production
+
+EXPOSE 5000
+CMD ["gunicorn", "--workers=3", "--threads=3", "-b", ":5000", "app:app", "--timeout 1000"]

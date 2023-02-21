@@ -1,13 +1,10 @@
-from io import StringIO
-import json
-
-import pandas as pd
 from celery.utils.log import get_task_logger
 import tempfile
 import os
 import time
 
-from optimos import run_optimization
+from pareto_algorithms_and_metrics.main import run_optimization
+
 from factory import create_celery, create_app
 
 logger = get_task_logger(__name__)

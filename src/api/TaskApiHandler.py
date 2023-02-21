@@ -4,8 +4,6 @@ from flask_restful import Resource
 from celery.result import AsyncResult
 from celery import states
 import json
-from flasgger import swag_from
-
 
 class TaskApiHandler(Resource):
     def get(self):
