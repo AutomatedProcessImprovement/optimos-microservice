@@ -41,7 +41,7 @@ def optimization_task(model_filename, sim_params_file, cons_params_file, num_ins
                               stats_file.name, log_name)
 
     return {
-        "stat_path": stats_filename,
+        "stat_path": os.path.join(celery_data_path, stats_filename),
         "report": report
     }
 
