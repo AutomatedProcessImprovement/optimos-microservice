@@ -5,6 +5,7 @@ from celery.result import AsyncResult
 from celery import states
 import json
 
+
 class TaskApiHandler(Resource):
     def get(self):
         task_id = request.args["taskId"]
@@ -22,4 +23,4 @@ class TaskApiHandler(Resource):
 
         response = make_response(str)
         response.headers['content-type'] = 'application/json'
-        return
+        return response
