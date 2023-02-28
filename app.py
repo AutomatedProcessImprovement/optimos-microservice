@@ -1,5 +1,6 @@
 from flask_restful import Api
 from factory import create_app
+from src.api.FileHandlerApi import FileApiHandler
 from src.api.TaskApiHandler import TaskApiHandler
 from src.api.OptimosApiHandler import OptimosApiHandler
 
@@ -28,3 +29,4 @@ def serve(path):
 
 api.add_resource(OptimosApiHandler, '/optimize')
 api.add_resource(TaskApiHandler, '/task')
+api.add_resource(FileApiHandler, '/optimizationFile')
