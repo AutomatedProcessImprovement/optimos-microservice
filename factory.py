@@ -41,9 +41,9 @@ def create_celery(app):
         CELERY_IGNORE_RESULT=False,
         CELERY_TRACK_STARTED=True,
         CELERYBEAT_SCHEDULE={
-            "every-hour-celery-data-clear": {
+            "every-day-celery-data-clear": {
                 "task": "src.tasks.clear_celery_folder",
-                "schedule": crontab(minute="0", hour="*/1"),
+                "schedule": crontab(minute="0", hour="*/24"),
                 "args": ()
             },
         }

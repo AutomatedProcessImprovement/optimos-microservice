@@ -1,3 +1,5 @@
+import uuid
+
 from flask import request, make_response
 from flask_restful import Resource
 
@@ -26,7 +28,8 @@ class OptimosApiHandler(Resource):
             total_iterations = int(form_data.get('total_iterations'))
             algorithm = form_data.get('algorithm')
             approach = form_data.get('approach')
-            log_name = form_data.get('logName')
+            # log_name = form_data.get('logName')
+            log_name = str(uuid.uuid4())
 
             sim_params_data = files_data.get('simScenarioFile')
             constraints_data = files_data.get('constraintsFile')
