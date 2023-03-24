@@ -4,6 +4,7 @@ import os
 import time
 
 from pareto_algorithms_and_metrics.main import run_optimization
+from support_modules.constraints_generator import generate_constraint_file
 
 from factory import create_celery, create_app
 
@@ -44,6 +45,24 @@ def optimization_task(model_filename, sim_params_file, cons_params_file, num_ins
         "stat_path": stats_filename,
         "report": report
     }
+
+@celery.task(name='cons_generation_task')
+def generate_constraints(sim_params_file, out_file=''):
+    logger.info(f'Sim params file: {sim_params_file}')
+    logger.info(f'Out file: {out_file}')
+
+    curr_dir_path = os.path.abspath(os.path.dirname(__file__))
+    celery_data_path = os.path.abspath(os.path.join(curr_dir_path, 'celery/data'))
+
+    sim_param_path = os.path.abspath(os.path.join(celery_data_path, sim_params_file))
+
+    generated_constraints = generate_constraint_file(sim_param_path, out_file)
+
+    return {
+        "constraints": generated_constraints
+    }
+
+
 
 
 @celery.task()
