@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  # broker deployment
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3-management
+    container_name: optimos-service-rabbitmq
+    # environment:
+    #     - RABBITMQ_DEFAULT_USER=myuser
+    #     - RABBITMQ_DEFAULT_PASS=mypassword
+    ports:
+      - 5672:5672 # port for the worker for tasks management
+      - 15672:15672 # GUI port
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - 6379:6379
