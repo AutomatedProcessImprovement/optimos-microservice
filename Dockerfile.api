@@ -5,8 +5,8 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN apt-get update && \
-    apt-get install -y git && \
+RUN apt-get update &&
+    apt-get install -y git &&
     python3 -m pip install --upgrade pip
 
 WORKDIR /app
@@ -42,8 +42,9 @@ COPY ./src ./src
 COPY ./exts.py .
 COPY ./factory.py .
 COPY ./app.py .
+COPY ./api.sh .
 
 ENV FLASK_ENV production
 
 EXPOSE 5000
-CMD ["gunicorn", "--workers=3", "--threads=3", "-b", ":5000", "app:app", "--timeout 1000"]
+CMD ["./api.sh"]
